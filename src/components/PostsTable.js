@@ -64,12 +64,12 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function PostsTable() {
+export default function PostsTable({ thePosts }) {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -100,18 +100,18 @@ export default function PostsTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = thePosts.map((n) => n.title);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, title) => {
+    const selectedIndex = selected.indexOf(title);
     let newSelected = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, title);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -136,11 +136,11 @@ export default function PostsTable() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - thePosts.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredPosts = applySortFilter(thePosts, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredPosts.length && !!filterName;
 
   return (
     <>
@@ -148,9 +148,6 @@ export default function PostsTable() {
         <Typography variant="h4" gutterBottom>
           Posts
         </Typography>
-        <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New Post
-        </Button>
       </Stack>
 
       <Card>
@@ -169,28 +166,25 @@ export default function PostsTable() {
                 onSelectAllClick={handleSelectAllClick}
               />
               <TableBody>
-                {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                  const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                  const selectedUser = selected.indexOf(name) !== -1;
+                {filteredPosts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  const { id, title, body } = row;
+                  const selectedPost = selected.indexOf(id) !== -1;
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                    <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedPost}>
                       <TableCell padding="checkbox">
-                        <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                        <Checkbox checked={selectedPost} onChange={(event) => handleClick(event, title)} />
                       </TableCell>
 
                       <TableCell component="th" scope="row" padding="none">
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                          <Avatar alt={name} src={avatarUrl} />
-                          <Typography variant="subtitle2" noWrap>
-                            {name}
-                          </Typography>
-                        </Stack>
+                        <Typography variant="subtitle2" noWrap>
+                          {id}
+                        </Typography>
                       </TableCell>
 
-                      <TableCell align="left">{company}</TableCell>
+                      <TableCell align="left">{title}</TableCell>
 
-                      <TableCell align="left">{role}</TableCell>
+                      <TableCell align="left">{body}</TableCell>
 
                       <TableCell align="right">
                         <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
