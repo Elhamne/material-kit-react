@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,9 +29,16 @@ export default function LoginForm() {
     setPassword(e.target.value);
   };
   const handleClick = () => {
-    // navigate('/dashboard', { replace: true });
     dispatch(login(email, password));
   };
+
+  useEffect(() => {
+    if (success && userInfo) {
+      navigate('/dashboard', { replace: true });
+    } else if (error) {
+      console.error(error);
+    }
+  }, [success, userInfo, error]);
 
   return (
     <>

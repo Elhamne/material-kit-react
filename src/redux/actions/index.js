@@ -15,7 +15,7 @@ export const login = (email, password) => async (dispatch) => {
   } else {
     dispatch({
       type: 'USER_LOGIN_FAIL',
-      payload: { message: 'Authentication failed' },
+      payload: 'Authentication failed',
     });
   }
 };
