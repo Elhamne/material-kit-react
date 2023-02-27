@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import account from '../../../_mock/account';
+import { logout } from '../../../redux/actions';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +27,7 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -97,7 +100,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={() => dispatch(logout())} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>
