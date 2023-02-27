@@ -1,14 +1,13 @@
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 // @mui
 import {
   Card,
   Table,
   Stack,
   Paper,
-  Avatar,
-  Button,
   Popover,
   Checkbox,
   TableRow,
@@ -21,14 +20,11 @@ import {
   TablePagination,
 } from '@mui/material';
 // components
-import Label from './label';
 import Iconify from './iconify';
 import Scrollbar from './scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-// mock
-import USERLIST from '../_mock/user';
-
+import { deletePost } from '../redux/actions';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -70,6 +66,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function PostsTable({ thePosts }) {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -84,12 +81,19 @@ export default function PostsTable({ thePosts }) {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleOpenMenu = (event) => {
+  const [rowId, setRowId] = useState(null);
+
+  const handleOpenMenu = (event, id) => {
+    setRowId(id);
     setOpen(event.currentTarget);
   };
 
   const handleCloseMenu = () => {
     setOpen(null);
+  };
+
+  const handleDelete = () => {
+    dispatch(deletePost(rowId));
   };
 
   const handleRequestSort = (event, property) => {
@@ -160,7 +164,7 @@ export default function PostsTable({ thePosts }) {
                 order={order}
                 orderBy={orderBy}
                 headLabel={TABLE_HEAD}
-                rowCount={USERLIST.length}
+                rowCount={thePosts.length}
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
                 onSelectAllClick={handleSelectAllClick}
@@ -187,7 +191,7 @@ export default function PostsTable({ thePosts }) {
                       <TableCell align="left">{body}</TableCell>
 
                       <TableCell align="right">
-                        <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                        <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
                           <Iconify icon={'eva:more-vertical-fill'} />
                         </IconButton>
                       </TableCell>
@@ -231,7 +235,7 @@ export default function PostsTable({ thePosts }) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={USERLIST.length}
+          count={thePosts.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -262,7 +266,7 @@ export default function PostsTable({ thePosts }) {
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={handleDelete}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
@@ -270,3 +274,7 @@ export default function PostsTable({ thePosts }) {
     </>
   );
 }
+
+PostsTable.propTypes = {
+  thePosts: PropTypes.array,
+};

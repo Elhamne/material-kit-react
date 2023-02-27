@@ -6,6 +6,9 @@ import {
   FETCH_POSTS_REQUEST,
   FETCH_POSTS_SUCCESS,
   FETCH_POSTS_FAIL,
+  DELETE_POST_REQUEST,
+  DELETE_POST_SUCCESS,
+  DELETE_POST_FAIL,
 } from '../constant';
 
 const publicApi = axios.create({
@@ -50,6 +53,22 @@ export const fetchPosts = () => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: FETCH_POSTS_FAIL,
+      payload: e.response && e.response.status ? e.response : e.message,
+    });
+  }
+};
+
+export const deletePost = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: DELETE_POST_REQUEST });
+    const { data } = await publicApi.delete(`/${id}`);
+    dispatch({
+      type: DELETE_POST_SUCCESS,
+      payload: data,
+    });
+  } catch (e) {
+    dispatch({
+      type: DELETE_POST_FAIL,
       payload: e.response && e.response.status ? e.response : e.message,
     });
   }

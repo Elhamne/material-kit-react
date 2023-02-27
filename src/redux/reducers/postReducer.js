@@ -1,4 +1,11 @@
-import { FETCH_POSTS_REQUEST, FETCH_POSTS_FAIL, FETCH_POSTS_SUCCESS } from '../constant';
+import {
+  FETCH_POSTS_REQUEST,
+  FETCH_POSTS_FAIL,
+  FETCH_POSTS_SUCCESS,
+  DELETE_POST_REQUEST,
+  DELETE_POST_SUCCESS,
+  DELETE_POST_FAIL,
+} from '../constant';
 
 export const fetchPostsReducers = (state = {}, action) => {
   switch (action.type) {
@@ -7,6 +14,19 @@ export const fetchPostsReducers = (state = {}, action) => {
     case FETCH_POSTS_SUCCESS:
       return { loading: false, success: true, thePosts: action.payload };
     case FETCH_POSTS_FAIL:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+
+export const deletePostReducer = (state = {}, action) => {
+  switch (action.type) {
+    case DELETE_POST_REQUEST:
+      return { loading: true, success: false };
+    case DELETE_POST_SUCCESS:
+      return { loading: false, success: true, delete: action.payload };
+    case DELETE_POST_FAIL:
       return { loading: false, error: action.payload };
     default:
       return state;
