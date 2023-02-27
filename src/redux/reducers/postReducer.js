@@ -5,6 +5,9 @@ import {
   DELETE_POST_REQUEST,
   DELETE_POST_SUCCESS,
   DELETE_POST_FAIL,
+  EDIT_POST_REQUEST,
+  EDIT_POST_SUCCESS,
+  EDIT_POST_FAIL,
 } from '../constant';
 
 export const fetchPostsReducers = (state = {}, action) => {
@@ -27,6 +30,19 @@ export const deletePostReducer = (state = {}, action) => {
     case DELETE_POST_SUCCESS:
       return { loading: false, success: true, delete: action.payload };
     case DELETE_POST_FAIL:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+
+export const editPostReducer = (state = {}, action) => {
+  switch (action.type) {
+    case EDIT_POST_REQUEST:
+      return { loading: true, success: false };
+    case EDIT_POST_SUCCESS:
+      return { loading: false, success: true, thePost: action.payload };
+    case EDIT_POST_FAIL:
       return { loading: false, error: action.payload };
     default:
       return state;

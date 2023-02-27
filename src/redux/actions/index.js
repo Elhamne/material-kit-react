@@ -9,6 +9,9 @@ import {
   DELETE_POST_REQUEST,
   DELETE_POST_SUCCESS,
   DELETE_POST_FAIL,
+  EDIT_POST_REQUEST,
+  EDIT_POST_SUCCESS,
+  EDIT_POST_FAIL,
 } from '../constant';
 
 const publicApi = axios.create({
@@ -69,6 +72,26 @@ export const deletePost = (id) => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: DELETE_POST_FAIL,
+      payload: e.response && e.response.status ? e.response : e.message,
+    });
+  }
+};
+
+export const editPost = (id, title, body) => async (dispatch) => {
+  try {
+    dispatch({ type: EDIT_POST_REQUEST });
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('body', body);
+    const { data } = await publicApi.patch(`/${id}`, formData);
+    dispatch({
+      type: EDIT_POST_SUCCESS,
+      payload: data,
+    });
+  } catch (e) {
+    dispatch({
+      type: EDIT_POST_FAIL,
       payload: e.response && e.response.status ? e.response : e.message,
     });
   }

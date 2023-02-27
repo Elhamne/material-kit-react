@@ -22,6 +22,7 @@ import {
 // components
 import Iconify from './iconify';
 import Scrollbar from './scrollbar';
+import EditPostModal from './modals/EditPostModal';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { deletePost } from '../redux/actions';
@@ -81,10 +82,11 @@ export default function PostsTable({ thePosts }) {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [rowId, setRowId] = useState(null);
+  const [thePost, setThePost] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const handleOpenMenu = (event, id) => {
-    setRowId(id);
+  const handleOpenMenu = (event, row) => {
+    setThePost(row);
     setOpen(event.currentTarget);
   };
 
@@ -93,7 +95,11 @@ export default function PostsTable({ thePosts }) {
   };
 
   const handleDelete = () => {
-    dispatch(deletePost(rowId));
+    dispatch(deletePost(thePost.id));
+  };
+
+  const handleEdit = () => {
+    setModalOpen(true);
   };
 
   const handleRequestSort = (event, property) => {
@@ -191,7 +197,7 @@ export default function PostsTable({ thePosts }) {
                       <TableCell align="left">{body}</TableCell>
 
                       <TableCell align="right">
-                        <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
+                        <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, row)}>
                           <Iconify icon={'eva:more-vertical-fill'} />
                         </IconButton>
                       </TableCell>
@@ -261,7 +267,7 @@ export default function PostsTable({ thePosts }) {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={handleEdit}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
@@ -271,6 +277,7 @@ export default function PostsTable({ thePosts }) {
           Delete
         </MenuItem>
       </Popover>
+      {modalOpen && thePost && <EditPostModal open={modalOpen} setOpen={setModalOpen} thePost={thePost} />}
     </>
   );
 }
