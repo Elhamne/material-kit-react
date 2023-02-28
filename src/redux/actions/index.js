@@ -48,7 +48,7 @@ export const logout = () => async (dispatch) => {
 export const fetchPosts = () => async (dispatch) => {
   try {
     dispatch({ type: FETCH_POSTS_REQUEST });
-    const { data } = await publicApi.get();
+    const { data } = await publicApi.get('/?_limit=20');
     dispatch({
       type: FETCH_POSTS_SUCCESS,
       payload: data,
