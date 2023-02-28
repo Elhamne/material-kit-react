@@ -3,11 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import {
+  Stack,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Alert,
+  Snackbar,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../components/iconify';
 import { login } from '../../../redux/actions';
+import { USER_LOGIN_RESET } from '../../../redux/constant';
 
 // ----------------------------------------------------------------------
 
@@ -18,6 +28,8 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [alertMsg, setAlertMsg] = useState('');
+  const [open, setOpen] = useState(false);
 
   const userLogin = useSelector((state) => state.userLogin);
   const { success, error, userInfo } = userLogin;
@@ -31,12 +43,17 @@ export default function LoginForm() {
   const handleClick = () => {
     dispatch(login(email, password));
   };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (success && userInfo) {
       navigate('/dashboard', { replace: true });
     } else if (error) {
-      console.error(error);
+      setAlertMsg(error);
+      setOpen(true);
+      dispatch({ type: USER_LOGIN_RESET });
     }
   }, [success, userInfo, error]);
 
@@ -69,6 +86,13 @@ export default function LoginForm() {
       <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
         Login
       </LoadingButton>
+      <Stack spacing={2} sx={{ width: '100%' }}>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+            {alertMsg}
+          </Alert>
+        </Snackbar>
+      </Stack>
     </>
   );
 }
