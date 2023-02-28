@@ -5,6 +5,6 @@ import { fetchPostsReducers, deletePostReducer, editPostReducer } from './postRe
 export default combineReducers({
   userLogin: userLoginReducer,
   posts: fetchPostsReducers,
-  deletePost: deletePostReducer,
+  deletedPost: deletePostReducer,
   editedPost: editPostReducer,
 });

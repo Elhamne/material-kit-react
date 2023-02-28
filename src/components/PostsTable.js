@@ -1,7 +1,7 @@
 import { filter } from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // @mui
 import {
   Card,
@@ -18,6 +18,8 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 // components
 import Iconify from './iconify';
@@ -26,6 +28,7 @@ import EditPostModal from './modals/EditPostModal';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { deletePost } from '../redux/actions';
+import { DELETE_POST_RESET, EDIT_POST_RESET } from '../redux/constant';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -84,6 +87,41 @@ export default function PostsTable({ thePosts }) {
 
   const [thePost, setThePost] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('info');
+  const [alertMsg, setAlertMsg] = useState('');
+
+  const deletedPost = useSelector((state) => state.deletedPost);
+  const { success: successDelete, error: errorDelete } = deletedPost;
+
+  const editedPost = useSelector((state) => state.editedPost);
+  const { success: successEdit, error: errorEdit } = editedPost;
+
+  useEffect(() => {
+    if (successDelete) {
+      setAlertSeverity('success');
+      setAlertMsg('The post deleted successfully.');
+      setOpenAlert(true);
+      dispatch({ type: DELETE_POST_RESET });
+    } else if (errorDelete) {
+      setAlertSeverity('error');
+      setAlertMsg(errorDelete);
+      setOpenAlert(true);
+    }
+  }, [successDelete, errorDelete]);
+
+  useEffect(() => {
+    if (successEdit) {
+      setAlertSeverity('success');
+      setAlertMsg('The post updated successfully.');
+      setOpenAlert(true);
+      dispatch({ type: EDIT_POST_RESET });
+    } else if (errorEdit) {
+      setAlertSeverity('error');
+      setAlertMsg(errorEdit);
+      setOpenAlert(true);
+    }
+  }, [successEdit, errorEdit]);
 
   const handleOpenMenu = (event, row) => {
     setThePost(row);
@@ -92,6 +130,10 @@ export default function PostsTable({ thePosts }) {
 
   const handleCloseMenu = () => {
     setOpen(null);
+  };
+
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
   };
 
   const handleDelete = () => {
@@ -278,6 +320,13 @@ export default function PostsTable({ thePosts }) {
         </MenuItem>
       </Popover>
       {modalOpen && thePost && <EditPostModal open={modalOpen} setOpen={setModalOpen} thePost={thePost} />}
+      <Stack spacing={2} sx={{ width: '100%' }}>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+            {alertMsg}
+          </Alert>
+        </Snackbar>
+      </Stack>
     </>
   );
 }
